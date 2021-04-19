@@ -17,6 +17,10 @@ public class Board extends JPanel implements ActionListener {
 
  private static final String TAG = "Board: ";
 
+ ///////////////////////////////////////////////////////////////////////////
+ // Constants
+ ///////////////////////////////////////////////////////////////////////////
+ 
  // Serial ID
  private static final long serialVersionUID = 1L;
  // Logic constants
