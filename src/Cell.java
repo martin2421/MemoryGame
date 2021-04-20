@@ -1,48 +1,23 @@
 import javax.swing.JButton;
 
-/**
- * A Cell on the Board, which holds the abstracted representation of it's identity in 
- * its getType() / setType() logic.  The identity can either be a hidden card, a card
- * that has an image, or a cell that has been matched and therefore that is considered
- * cleared from the board.
- * @author Yasser Ghamlouch <a href="mailto:yasman8@gmail.com">yasman8@gmail.com</a>
- */
 public class Cell extends JButton {
-
- ////////////////////////////////////////////////////////////////////////////
- // Constant
- ////////////////////////////////////////////////////////////////////////////
 
  // Debug
  private static final String TAG = "Cell: ";
  
  // Cell types
- private static final int MAX_TYPE_RANGE = 26;
- private static final int MIN_TYPE_RANGE = 0;
- private static final int EMPTY_CELL_TYPE = 25;
+ private static final int MAX_RANGE = 26;
+ private static final int MIN_RANGE = 0;
+ private static final int EMPTY_CELL = 25;
  
- ////////////////////////////////////////////////////////////////////////////
- // Instance variables
- ////////////////////////////////////////////////////////////////////////////
- private boolean mIsSelected = false;
- private boolean mIsMatched = false;
- private int mType = EMPTY_CELL_TYPE;
+ private boolean isSelected = false;
+ private boolean isMatched = false;
+ private int type = EMPTY_CELL;
 
- ////////////////////////////////////////////////////////////////////////////
- // Constructor
- ////////////////////////////////////////////////////////////////////////////
-
- /**
-  * Creates a cell of the specified type.
-  */
  public Cell(int aType) {
   super();
-  mType = aType;
+  type = aType;
  }
-
- ////////////////////////////////////////////////////////////////////////////
- // Public Interface
- ////////////////////////////////////////////////////////////////////////////
 
  /**
   * This method gets the type of the cell
@@ -52,21 +27,21 @@ public class Cell extends JButton {
   */
  public int getType() {
 
-  return mType;
+  return type;
  }
 
  /**
-  * Sets the type of this cell. The range is between MIN_TYPE_RANGE
-  * and MAX_TYPE_RANGE
+  * Sets the type of this cell. The range is between MIN_RANGE
+  * and MAX_RANGE
   * @param aType is a valid integer value.  An invalid value
   * means something is wrong with the caller, and therefore the
   * program will stop with an error.
   */
  public void setType(int aType) {
-  if (aType > MAX_TYPE_RANGE || aType < MIN_TYPE_RANGE){
+  if (aType > MAX_RANGE || aType < MIN_RANGE){
    error("setType(int) reported \"Invalid type code\"", true);
   }
-  mType = aType;
+  type = aType;
  }
 
  /**
@@ -97,7 +72,7 @@ public class Cell extends JButton {
   * if this cell has not yet been paired with another cell
   */
  public boolean isEmpty() {
-  if (this.mType != EMPTY_CELL_TYPE) {
+  if (this.type != EMPTY_CELL) {
    return false;
   }
   return true;
@@ -110,7 +85,7 @@ public class Cell extends JButton {
   */
  public void setSelected(boolean selected) {
 
-  mIsSelected = selected;
+  isSelected = selected;
  }
 
  /**
@@ -121,7 +96,7 @@ public class Cell extends JButton {
   */
  public void setMatched(boolean matched) {
 
-  mIsMatched = matched;
+  isMatched = matched;
  }
 
  /**
@@ -132,7 +107,7 @@ public class Cell extends JButton {
   */
  public boolean isSelected() {
 
-  if (mIsSelected == true) {
+  if (isSelected == true) {
    return true;
   }
 
@@ -147,7 +122,7 @@ public class Cell extends JButton {
   */
  public boolean isMatched() {
 
-  if (mIsMatched == true) {
+  if (isMatched == true) {
    return true;
   } else {
    return false;

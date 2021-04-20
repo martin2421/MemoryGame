@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Game",
+            "request": "launch",
+            "mainClass": "Game",
+            "projectName": "MemoryGame_932be462"
+        },
+        {
+            "type": "java",
             "name": "Launch Memory",
             "request": "launch",
             "mainClass": "Memory",

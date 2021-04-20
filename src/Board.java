@@ -10,106 +10,70 @@ public class Board extends JPanel implements ActionListener {
 
  private static final String TAG = "Board: ";
 
- ///////////////////////////////////////////////////////////////////////////
  // Constants
- ///////////////////////////////////////////////////////////////////////////
- 
- // Logic constants
- private static final int BOARD_BORDER_WIDTH = 20;
- private static final int MAX_NUM_OF_CARDS = 24;
- private static final int MIN_NUM_OF_CARDS = 1;
- private static final int NUMBER_OF_ROWS = 4;
- private static final int NUMBER_OF_COLUMNS = 6;
- private static final int NUMBER_OF_PAIRS = 12;
+ private static final int WIDTH = 20;
+ private static final int MAX_CARDS = 24;
+ private static final int MIN_CARDS = 1;
+ private static final int ROWS = 4;
+ private static final int COLUMNS = 6;
+ private static final int PAIRS = 12;
 
  private static final int MAX_SELECTED_CARDS = 2;
  private static final int FIRST = 0;
  private static final int SECOND = 1;
- private static final int VISIBLE_DELAY = (int) 2 * 1000;
- private static final int PEEK_DELAY = (int) 2 * 1000;
+ private static final int VISIBLE_DELAY = 2000;
+ private static final int PEEK_DELAY = 2000;
 
- // Card types
- private static final int EMPTY_CELL_TYPE = 0;
- private static final int HIDDEN_CARD_TYPE = 26;
- private static final int EMPTY_CARD_TYPE = 25;
+ // Type of Cards
+ private static final int EMPTY_CELL = 0;
+ private static final int HIDDEN_CARD = 26;
+ private static final int EMPTY_CARD = 25;
 
  // Card image file properties
- private static final String DEFAULT_IMAGE_FILENAME_SUFFIX = ".jpg";
- private static final String DEFAULT_IMAGE_FILENAME_PREFIX = "img-";
- private static final String DEFAULT_IMAGE_FOLDER = "/images/";
- private static final String HIDDEN_IMAGE_PATH = DEFAULT_IMAGE_FOLDER
-   + DEFAULT_IMAGE_FILENAME_PREFIX + "26"
-   + DEFAULT_IMAGE_FILENAME_SUFFIX;
- private static final String EMPTY_IMAGE_PATH = DEFAULT_IMAGE_FOLDER
-   + DEFAULT_IMAGE_FILENAME_PREFIX + "25"
-   + DEFAULT_IMAGE_FILENAME_SUFFIX;
-
- ////////////////////////////////////////////////////////////////////////////
- // Static variables
- ////////////////////////////////////////////////////////////////////////////
+ private static final String SUFFIX = ".jpg";
+ private static final String PREFIX = "img-";
+ private static final String FOLDER = "/images/";
+ private static final String HIDDEN_IMAGE = FOLDER + PREFIX + "26" + SUFFIX;
+ private static final String EMPTY_IMAGE = FOLDER + PREFIX + "25" + SUFFIX;
 
  private static ArrayList<Cell> chosenCards = new ArrayList<Cell>();
- private static int numOfMatchedPairs = 0;
- private static int numOfFailedAttempts = 0;
+ private static int failedAttempts = 0;
  private static int selectedCards = 0;
 
- ////////////////////////////////////////////////////////////////////////////
- // Instance variables
- ////////////////////////////////////////////////////////////////////////////
+ private Cell[][] board = null;
+ private String[] cardStorage = initCardStorage();
+ private Cell[] cardChecker = new Cell[MAX_SELECTED_CARDS];
 
- private Cell[][] mBoard = null;
- private String[] mCardStorage = initCardStorage();
- private Cell[] mCardChecker = new Cell[MAX_SELECTED_CARDS];
-
- ////////////////////////////////////////////////////////////////////////////
- // Constructor
- ////////////////////////////////////////////////////////////////////////////
- 
- /**
-  * Initialize a Board ready to be used for a game.
-  */
  public Board() {
   super();
 
   setBackground(Color.WHITE);
-  setBorder(BorderFactory.createEmptyBorder(BOARD_BORDER_WIDTH,
-    BOARD_BORDER_WIDTH, BOARD_BORDER_WIDTH, BOARD_BORDER_WIDTH));
-  setLayout(new GridLayout(NUMBER_OF_ROWS, NUMBER_OF_COLUMNS));
+  setBorder(BorderFactory.createEmptyBorder(WIDTH, WIDTH, WIDTH, WIDTH));
+  setLayout(new GridLayout(ROWS, COLUMNS));
 
-  mBoard = new Cell[NUMBER_OF_ROWS][NUMBER_OF_COLUMNS];
+  board = new Cell[ROWS][COLUMNS];
 
-  for (int row = 0; row < NUMBER_OF_ROWS; row++) {
-   for (int column = 0; column < NUMBER_OF_COLUMNS; column++) {
-    mBoard[row][column] = new Cell(EMPTY_CELL_TYPE);
-    mBoard[row][column].addActionListener(this);
-    add(mBoard[row][column]);
+  for (int row = 0; row < ROWS; row++) {
+   for (int column = 0; column < COLUMNS; column++) {
+    board[row][column] = new Cell(EMPTY_CELL);
+    board[row][column].addActionListener(this);
+    add(board[row][column]);
    }
   }
 
   init();
  }
 
- ////////////////////////////////////////////////////////////////////////////
- // Public Interface
- ////////////////////////////////////////////////////////////////////////////
-
- /**
-  * This method initializes the board with a new set of cards
-  */
  public void init() {
 
   resetMatchedImages();
   resetBoardParam();
   peek();
-  mCardStorage = initCardStorage();
+  cardStorage = initCardStorage();
   setImages();
 
  }
 
- /**
-  * This method reinitializes the board with the current set of cards i.e.
-  * replay
-  */
  public void reInit() {
 
   resetMatchedImages();
@@ -128,11 +92,11 @@ public class Board extends JPanel implements ActionListener {
  public boolean isSolved() {
 
   // No check for null, the method can't be called out of
-  // an instance, and the constructor initialize the mBoard
+  // an instance, and the constructor initialize the board
 
-  for (int row = 0; row < NUMBER_OF_ROWS; row++) {
-   for (int column = 0; column < NUMBER_OF_COLUMNS; column++) {
-    if (!mBoard[row][column].isEmpty()) {
+  for (int row = 0; row < ROWS; row++) {
+   for (int column = 0; column < COLUMNS; column++) {
+    if (!board[row][column].isEmpty()) {
      return false;
     }
    } // column loop
@@ -164,8 +128,8 @@ public class Board extends JPanel implements ActionListener {
   * This method is the action performed when a card is clicked it represents
   * the main user interface of the game
   * 
-  * @param e
-  *            an ActionEvent
+  * @param e an ActionEvent
+  *           
   */
  public void actionPerformed(ActionEvent e) {
 
@@ -190,16 +154,16 @@ public class Board extends JPanel implements ActionListener {
   if (selectedCards <= MAX_SELECTED_CARDS) {
    Point gridLoc = getCellLocation((Cell) e.getSource());
    setCardToVisible(gridLoc.x, gridLoc.y);
-   mCardChecker[selectedCards - 1] = getCellAtLoc(gridLoc);
+   cardChecker[selectedCards - 1] = getCellAtLoc(gridLoc);
    addToChose(getCellAtLoc(gridLoc));
   }
 
   if (selectedCards == MAX_SELECTED_CARDS) {
 
-   if (!sameCellPosition(mCardChecker[FIRST].getLocation(),
-     mCardChecker[SECOND].getLocation())) {
+   if (!sameCellPosition(cardChecker[FIRST].getLocation(),
+     cardChecker[SECOND].getLocation())) {
 
-    setSelectedCards(mCardChecker[FIRST], mCardChecker[SECOND]);
+    setSelectedCards(cardChecker[FIRST], cardChecker[SECOND]);
    } else {
     --selectedCards;
    }
@@ -217,13 +181,13 @@ public class Board extends JPanel implements ActionListener {
    return null;
   }
 
-  return mBoard[point.x][point.y];
+  return board[point.x][point.y];
  }
 
  // This method sets a card to visible at a certain location
  private void setCardToVisible(int x, int y) {
 
-  mBoard[x][y].setSelected(true);
+  board[x][y].setSelected(true);
   showCardImages();
  }
 
@@ -248,15 +212,15 @@ public class Board extends JPanel implements ActionListener {
 
   ImageIcon anImage;
 
-  for (int row = 0; row < NUMBER_OF_ROWS; row++) {
-   for (int column = 0; column < NUMBER_OF_COLUMNS; column++) {
+  for (int row = 0; row < ROWS; row++) {
+   for (int column = 0; column < COLUMNS; column++) {
 
     URL file = getClass().getResource(
-      DEFAULT_IMAGE_FOLDER
-        + DEFAULT_IMAGE_FILENAME_PREFIX
-        + mCardStorage[column
-          + (NUMBER_OF_COLUMNS * row)]
-        + DEFAULT_IMAGE_FILENAME_SUFFIX);
+      FOLDER
+        + PREFIX
+        + cardStorage[column
+          + (COLUMNS * row)]
+        + SUFFIX);
 
     if (file == null) {
      System.err.println(TAG
@@ -266,7 +230,7 @@ public class Board extends JPanel implements ActionListener {
 
     anImage = new ImageIcon(file);
 
-    mBoard[row][column].setIcon(anImage);
+    board[row][column].setIcon(anImage);
 
    } // column loop
   } // row loop
@@ -276,9 +240,9 @@ public class Board extends JPanel implements ActionListener {
  private void showImage(int x, int y) {
 
   URL file = getClass().getResource(
-    DEFAULT_IMAGE_FOLDER + DEFAULT_IMAGE_FILENAME_PREFIX
-      + mCardStorage[y + (NUMBER_OF_COLUMNS * x)]
-      + DEFAULT_IMAGE_FILENAME_SUFFIX);
+    FOLDER + PREFIX
+      + cardStorage[y + (COLUMNS * x)]
+      + SUFFIX);
 
   if (file == null) {
    System.err.println(TAG
@@ -287,7 +251,7 @@ public class Board extends JPanel implements ActionListener {
   }
 
   ImageIcon anImage = new ImageIcon(file);
-  mBoard[x][y].setIcon(anImage);
+  board[x][y].setIcon(anImage);
 
  }
 
@@ -295,34 +259,34 @@ public class Board extends JPanel implements ActionListener {
  private void showCardImages() {
 
   // For each card on the board
-  for (int row = 0; row < NUMBER_OF_ROWS; row++) {
-   for (int column = 0; column < NUMBER_OF_COLUMNS; column++) {
+  for (int row = 0; row < ROWS; row++) {
+   for (int column = 0; column < COLUMNS; column++) {
 
     // Is card selected ?
-    if (!mBoard[row][column].isSelected()) {
+    if (!board[row][column].isSelected()) {
 
      // If selected, verify if the card was matched by the user
-     if (mBoard[row][column].isMatched()) {
+     if (board[row][column].isMatched()) {
       // It was matched, empty the card slot
-      mBoard[row][column].setIcon(new ImageIcon(getClass()
-        .getResource(EMPTY_IMAGE_PATH)));
-      mBoard[row][column].setType(EMPTY_CARD_TYPE);
+      board[row][column].setIcon(new ImageIcon(getClass()
+        .getResource(EMPTY_IMAGE)));
+      board[row][column].setType(EMPTY_CARD);
      } else {
       // It was not, put the "hidden card" image
-      mBoard[row][column].setIcon(new ImageIcon(getClass()
-        .getResource(HIDDEN_IMAGE_PATH)));
-      mBoard[row][column].setType(HIDDEN_CARD_TYPE);
+      board[row][column].setIcon(new ImageIcon(getClass()
+        .getResource(HIDDEN_IMAGE)));
+      board[row][column].setType(HIDDEN_CARD);
      }
 
     } else {
      // The card was not selected
      showImage(row, column);
 
-     String type = mCardStorage[column
-       + (NUMBER_OF_COLUMNS * row)];
+     String type = cardStorage[column
+       + (COLUMNS * row)];
      int parsedType = Integer.parseInt(type);
 
-     mBoard[row][column].setType(parsedType);
+     board[row][column].setType(parsedType);
 
     } // Is card selected?
    } // inner loop - columns
@@ -349,41 +313,41 @@ public class Board extends JPanel implements ActionListener {
 
  private String[] initCardStorage() {
 
-  String[] cardStorage = new String[MAX_NUM_OF_CARDS];
-  String[] firstPair = new String[NUMBER_OF_PAIRS];
-  String[] secondPair = new String[NUMBER_OF_PAIRS];
+  String[] cardStorage = new String[MAX_CARDS];
+  String[] firstPair = new String[PAIRS];
+  String[] secondPair = new String[PAIRS];
 
   firstPair = randomListWithoutRep();
 
-  for (int i = 0; i < NUMBER_OF_PAIRS; i++) {
+  for (int i = 0; i < PAIRS; i++) {
    cardStorage[i] = firstPair[i];
   }
 
   Collections.shuffle(Arrays.asList(firstPair));
 
-  for (int j = 0; j < NUMBER_OF_PAIRS; j++) {
+  for (int j = 0; j < PAIRS; j++) {
    secondPair[j] = firstPair[j];
   }
 
-  for (int k = NUMBER_OF_PAIRS; k < MAX_NUM_OF_CARDS; k++) {
-   cardStorage[k] = secondPair[k - NUMBER_OF_PAIRS];
+  for (int k = PAIRS; k < MAX_CARDS; k++) {
+   cardStorage[k] = secondPair[k - PAIRS];
   }
 
   return cardStorage;
  }
 
- // this method is to generate a list of NUMBER_OF_PAIRS images (types)
+ // this method is to generate a list of PAIRS images (types)
  // without repetition
 
  private String[] randomListWithoutRep() {
 
-  String[] generatedArray = new String[NUMBER_OF_PAIRS];
+  String[] generatedArray = new String[PAIRS];
   ArrayList<String> generated = new ArrayList<String>();
 
-  for (int i = 0; i < NUMBER_OF_PAIRS; i++) {
+  for (int i = 0; i < PAIRS; i++) {
    while (true) {
-    String next = generateRandomImageFilename(MAX_NUM_OF_CARDS,
-      MIN_NUM_OF_CARDS);
+    String next = generateRandomImageFilename(MAX_CARDS,
+      MIN_CARDS);
 
     if (!generated.contains(next)) {
      generated.add(next);
@@ -392,7 +356,7 @@ public class Board extends JPanel implements ActionListener {
     }
    } // inner loop - for every random card, ensure its not already
     // existing
-  } // outer loop - we want NUMBER_OF_PAIRS different pairs
+  } // outer loop - we want PAIRS different pairs
 
   return generatedArray;
  }
@@ -408,11 +372,11 @@ public class Board extends JPanel implements ActionListener {
 
   Point p = new Point();
 
-  for (int column = 0; column < NUMBER_OF_ROWS; column++) {
+  for (int column = 0; column < ROWS; column++) {
 
-   for (int row = 0; row < NUMBER_OF_COLUMNS; row++) {
+   for (int row = 0; row < COLUMNS; row++) {
 
-    if (mBoard[column][row] == aCell) {
+    if (board[column][row] == aCell) {
      p.setLocation(column, row);
      return p;
     }
@@ -473,7 +437,6 @@ public class Board extends JPanel implements ActionListener {
    showImage(getCellLocation(secondCell).x,
      getCellLocation(secondCell).y);
    peek();
-   numOfMatchedPairs++;
    finalMessage();
   } else {
 
@@ -484,7 +447,7 @@ public class Board extends JPanel implements ActionListener {
    showImage(getCellLocation(secondCell).x,
      getCellLocation(secondCell).y);
    peek();
-   numOfFailedAttempts++;
+   failedAttempts++;
   }
   resetSelectedCards();
  }
@@ -516,12 +479,12 @@ public class Board extends JPanel implements ActionListener {
    public void actionPerformed(ActionEvent e) {
     if (isSolved()) {
 
-     Float numeralScore = (((float) numOfFailedAttempts) / ((float) MAX_NUM_OF_CARDS)) * 100;
+     Float numeralScore = (((float) failedAttempts) / ((float) MAX_CARDS)) * 100;
      String textualScore = numeralScore.toString();
 
      JOptionPane.showMessageDialog(null,
        "Solved!! Your results:\n" + " Failed Attempts: "
-         + numOfFailedAttempts
+         + failedAttempts
          + "\n Error percentage : " + textualScore
          + " %", "RESULTS",
        JOptionPane.INFORMATION_MESSAGE);
@@ -538,10 +501,10 @@ public class Board extends JPanel implements ActionListener {
  // this method resets all the matched images, used in the replay method and
  // new game
  private void resetMatchedImages() {
-  for (int row = 0; row < NUMBER_OF_ROWS; row++) {
-   for (int column = 0; column < NUMBER_OF_COLUMNS; column++) {
-    if (mBoard[row][column].isMatched()) {
-     mBoard[row][column].setMatched(false);
+  for (int row = 0; row < ROWS; row++) {
+   for (int column = 0; column < COLUMNS; column++) {
+    if (board[row][column].isMatched()) {
+     board[row][column].setMatched(false);
     } // if
    } // for column
   } // for row
@@ -569,12 +532,11 @@ public class Board extends JPanel implements ActionListener {
 
  // This method resets the number of matched pairs on the board
  private static void resetNumMatchedCards() {
-  numOfMatchedPairs = 0;
  }
 
  // This method resets the number of failed attempts
  private static void resetFailedAttempts() {
-  numOfFailedAttempts = 0;
+  failedAttempts = 0;
  }
 
  // This method resets the parameters of the board
