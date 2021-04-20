@@ -16,9 +16,6 @@ public class Cell extends JButton {
  // Debug
  private static final String TAG = "Cell: ";
  
- // Serial
- private static final long serialVersionUID = 1L;
- 
  // Cell types
  private static final int MAX_TYPE_RANGE = 26;
  private static final int MIN_TYPE_RANGE = 0;

@@ -6,13 +6,6 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
-/**
- * A Board implementation that holds cards and maintain their states.
- * 
- * @author Yasser Ghamlouch <a
- *         href="mailto:yasman8@gmail.com">mailto:yasman8@gmail.com</a>
- * 
- */
 public class Board extends JPanel implements ActionListener {
 
  private static final String TAG = "Board: ";
@@ -21,8 +14,6 @@ public class Board extends JPanel implements ActionListener {
  // Constants
  ///////////////////////////////////////////////////////////////////////////
  
- // Serial ID
- private static final long serialVersionUID = 1L;
  // Logic constants
  private static final int BOARD_BORDER_WIDTH = 20;
  private static final int MAX_NUM_OF_CARDS = 24;
@@ -73,6 +64,7 @@ public class Board extends JPanel implements ActionListener {
  ////////////////////////////////////////////////////////////////////////////
  // Constructor
  ////////////////////////////////////////////////////////////////////////////
+ 
  /**
   * Initialize a Board ready to be used for a game.
   */
@@ -240,8 +232,6 @@ public class Board extends JPanel implements ActionListener {
  private void peek() {
 
   Action showImagesAction = new AbstractAction() {
-
-   private static final long serialVersionUID = 1L;
 
    public void actionPerformed(ActionEvent e) {
     showCardImages();

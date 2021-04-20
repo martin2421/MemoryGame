@@ -5,5 +5,8 @@
     "liveshare.featureSet": "insiders",
     "liveshare.languages.allowGuestCommandControl": true,
     "liveshare.notebooks.allowGuestExecuteCells": true,
-    "liveshare.publishWorkspaceInfo": true
+    "liveshare.publishWorkspaceInfo": true,
+    "java.project.sourcePaths": [
+        "src"
+    ]
 }
