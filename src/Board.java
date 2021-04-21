@@ -8,8 +8,6 @@ import javax.swing.Timer;
 
 public class Board extends JPanel implements ActionListener {
 
- private static final String TAG = "Board: ";
-
  // Constants
  private static final int WIDTH = 20;
  private static final int MAX_CARDS = 24;
@@ -21,8 +19,8 @@ public class Board extends JPanel implements ActionListener {
  private static final int MAX_SELECTED_CARDS = 2;
  private static final int FIRST = 0;
  private static final int SECOND = 1;
- private static final int VISIBLE_DELAY = 2000;
- private static final int PEEK_DELAY = 2000;
+ private static final int VISIBLE_DELAY = 4000;
+ private static final int PEEK_DELAY = 2500;
 
  // Type of Cards
  private static final int EMPTY_CELL = 0;
@@ -60,27 +58,22 @@ public class Board extends JPanel implements ActionListener {
     add(board[row][column]);
    }
   }
-
   init();
  }
 
  public void init() {
-
   resetMatchedImages();
   resetBoardParam();
   peek();
   cardStorage = initCardStorage();
   setImages();
-
  }
 
  public void reInit() {
-
   resetMatchedImages();
   resetBoardParam();
   peek();
   setImages();
-
  }
 
  /**
@@ -96,32 +89,23 @@ public class Board extends JPanel implements ActionListener {
 
   for (int row = 0; row < ROWS; row++) {
    for (int column = 0; column < COLUMNS; column++) {
-    if (!board[row][column].isEmpty()) {
-     return false;
-    }
-   } // column loop
-  } // row loop
-
+    if (!board[row][column].isEmpty()) {return false;}
+   } 
+  } 
   return true;
  }
 
  /**
   * This method adds a selected card to the chosen card list
   * 
-  * @param aCard
+  * @param cardB
   *            is the card to be added to the list
   */
 
- private void addToChose(Cell aCard) {
-
-  if (aCard != null) {
-   if (!chosenCards.contains(aCard)) {
-    chosenCards.add(aCard);
-   }
-  } else {
-   error("addToChose( Cell ) received null.", true);
-  }
-
+ private void addToChose(Cell cardB) {
+  if (cardB != null) {
+   if (!chosenCards.contains(cardB)) {chosenCards.add(cardB);}
+  } 
  }
 
  /**
@@ -132,22 +116,11 @@ public class Board extends JPanel implements ActionListener {
   *           
   */
  public void actionPerformed(ActionEvent e) {
+  if (e == null) {return;}
 
-  if (e == null) {
-   error("actionPermormed(ActionEvent) received null", false);
-   return;
-  }
+  if (!(e.getSource() instanceof Cell)) {return;}
 
-  // Flush out cases where we don't care
-  if (!(e.getSource() instanceof Cell)) {
-   return;
-  }
-
-  if (!isCardValid((Cell) e.getSource())) {
-   return;
-  }
-
-  // Proceed with cases we want to cover
+  if (!isCardValid((Cell) e.getSource())) {return;}
 
   ++selectedCards;
 
@@ -160,33 +133,22 @@ public class Board extends JPanel implements ActionListener {
 
   if (selectedCards == MAX_SELECTED_CARDS) {
 
-   if (!sameCellPosition(cardChecker[FIRST].getLocation(),
-     cardChecker[SECOND].getLocation())) {
-
+   if (!sameCellPosition(cardChecker[FIRST].getLocation(), cardChecker[SECOND].getLocation())) {
     setSelectedCards(cardChecker[FIRST], cardChecker[SECOND]);
    } else {
     --selectedCards;
    }
-  } // if selectedCards == MAX
+  }
  }
-
- ////////////////////////////////////////////////////////////////////////////
- // Utils Methods
- ////////////////////////////////////////////////////////////////////////////
 
  // This method returns the location of a Cell object on the board
  private Cell getCellAtLoc(Point point) {
-  if (point == null) {
-   error("getCellAtLoc( Point ) received null", true);
-   return null;
-  }
-
+  if (point == null) {return null;}
   return board[point.x][point.y];
  }
 
  // This method sets a card to visible at a certain location
  private void setCardToVisible(int x, int y) {
-
   board[x][y].setSelected(true);
   showCardImages();
  }
@@ -196,12 +158,10 @@ public class Board extends JPanel implements ActionListener {
  private void peek() {
 
   Action showImagesAction = new AbstractAction() {
-
-   public void actionPerformed(ActionEvent e) {
-    showCardImages();
-   }
+   public void actionPerformed(ActionEvent e) {showCardImages();}
   };
 
+  // Setting peek delay
   Timer timer = new Timer(PEEK_DELAY, showImagesAction);
   timer.setRepeats(false);
   timer.start();
@@ -214,41 +174,25 @@ public class Board extends JPanel implements ActionListener {
 
   for (int row = 0; row < ROWS; row++) {
    for (int column = 0; column < COLUMNS; column++) {
+    URL file = getClass().getResource(FOLDER + PREFIX + cardStorage[column + (COLUMNS * row)] + SUFFIX);
 
-    URL file = getClass().getResource(
-      FOLDER
-        + PREFIX
-        + cardStorage[column
-          + (COLUMNS * row)]
-        + SUFFIX);
-
-    if (file == null) {
-     System.err.println(TAG
-       + "setImages() reported error \"File not found\".");
-     System.exit(-1);
-    }
+    // If the file is not found
+    if (file == null) {System.exit(-1);}
 
     anImage = new ImageIcon(file);
-
     board[row][column].setIcon(anImage);
 
-   } // column loop
-  } // row loop
+   } 
+  } 
  }
 
  // This method shows a specific image at a certain location
  private void showImage(int x, int y) {
 
   URL file = getClass().getResource(
-    FOLDER + PREFIX
-      + cardStorage[y + (COLUMNS * x)]
-      + SUFFIX);
+    FOLDER + PREFIX + cardStorage[y + (COLUMNS * x)] + SUFFIX);
 
-  if (file == null) {
-   System.err.println(TAG
-     + "showImage(int, int) reported error \"File not found\".");
-   System.exit(-1);
-  }
+  if (file == null) {System.exit(-1);}
 
   ImageIcon anImage = new ImageIcon(file);
   board[x][y].setIcon(anImage);
@@ -282,29 +226,26 @@ public class Board extends JPanel implements ActionListener {
      // The card was not selected
      showImage(row, column);
 
-     String type = cardStorage[column
-       + (COLUMNS * row)];
+     String type = cardStorage[column + (COLUMNS * row)];
      int parsedType = Integer.parseInt(type);
-
      board[row][column].setType(parsedType);
 
-    } // Is card selected?
-   } // inner loop - columns
-  } // outer loop - rows
+    } 
+   } 
+  } 
  }
 
  // This method generates a random image, i.e. a random integer representing
  // the type of the image
 
  private String generateRandomImageFilename(int max, int min) {
-
   Random random = new Random();
-  Integer aNumber = (min + random.nextInt(max));
+  Integer num = (min + random.nextInt(max));
 
-  if (aNumber > 0 && aNumber < 10) {
-   return "0" + aNumber;
+  if (num > 0 && num < 10) {
+    return "0" + num;
   } else {
-   return aNumber.toString();
+   return num.toString();
   }
  }
 
@@ -319,14 +260,12 @@ public class Board extends JPanel implements ActionListener {
 
   firstPair = randomListWithoutRep();
 
-  for (int i = 0; i < PAIRS; i++) {
-   cardStorage[i] = firstPair[i];
+  for (int i = 0; i < PAIRS; i++) {cardStorage[i] = firstPair[i];
   }
 
   Collections.shuffle(Arrays.asList(firstPair));
 
-  for (int j = 0; j < PAIRS; j++) {
-   secondPair[j] = firstPair[j];
+  for (int j = 0; j < PAIRS; j++) {secondPair[j] = firstPair[j];
   }
 
   for (int k = PAIRS; k < MAX_CARDS; k++) {
@@ -352,12 +291,10 @@ public class Board extends JPanel implements ActionListener {
     if (!generated.contains(next)) {
      generated.add(next);
      generatedArray[i] = generated.get(i);
-     break; // breaks back to "for" loop
+     break; 
     }
-   } // inner loop - for every random card, ensure its not already
-    // existing
-  } // outer loop - we want PAIRS different pairs
-
+   } 
+  } 
   return generatedArray;
  }
 
@@ -365,23 +302,18 @@ public class Board extends JPanel implements ActionListener {
  // specific point
  private Point getCellLocation(Cell aCell) {
 
-  if (aCell == null) {
-   error("getCellLocation(Cell) received null", true);
-   return null;
-  }
+  if (aCell == null) {return null;}
 
   Point p = new Point();
 
   for (int column = 0; column < ROWS; column++) {
-
    for (int row = 0; row < COLUMNS; row++) {
-
     if (board[column][row] == aCell) {
      p.setLocation(column, row);
      return p;
     }
-   } // row for
-  } // column for
+   } 
+  } 
   return null;
  }
 
@@ -390,19 +322,8 @@ public class Board extends JPanel implements ActionListener {
 
   if (firstCell == null || secondCell == null) {
    if (secondCell == firstCell) {
-    // They're equal if both are null
     return true;
    }
-
-   if (firstCell == null) {
-    error("sameCellPosition(Point, Point) received (null, ??)",
-      true);
-   }
-   if (secondCell == null) {
-    error("sameCellPosition(Point, Point) received (??, null)",
-      true);
-   }
-
    return false;
   }
 
@@ -418,24 +339,15 @@ public class Board extends JPanel implements ActionListener {
  private void setSelectedCards(Cell firstCell, Cell secondCell) {
 
   if (firstCell == null || secondCell == null) {
-
-   if (firstCell == null) {
-    error("setSelectedCards(Cell, Cell) received (null, ??)", true);
-   }
-   if (secondCell == null) {
-    error("setSelectedCards(Cell, Cell) received (??, null)", true);
-   }
    return;
   }
 
   if (firstCell.sameType(secondCell)) {
-
    firstCell.setMatched(true);
    secondCell.setMatched(true);
    firstCell.setSelected(false);
    secondCell.setSelected(false);
-   showImage(getCellLocation(secondCell).x,
-     getCellLocation(secondCell).y);
+   showImage(getCellLocation(secondCell).x, getCellLocation(secondCell).y);
    peek();
    finalMessage();
   } else {
@@ -444,29 +356,23 @@ public class Board extends JPanel implements ActionListener {
    secondCell.setMatched(false);
    firstCell.setSelected(false);
    secondCell.setSelected(false);
-   showImage(getCellLocation(secondCell).x,
-     getCellLocation(secondCell).y);
+   showImage(getCellLocation(secondCell).x, getCellLocation(secondCell).y);
    peek();
    failedAttempts++;
   }
   resetSelectedCards();
  }
 
- // This method checks if a selected card is valid, the user isn't allowed to
- // select blank cells again
- private boolean isCardValid(Cell aCard) {
+ // This method checks if a selected card is valid, the user isn't allowed to select blank cells again
+ private boolean isCardValid(Cell cardB) {
 
-  if (aCard == null) {
-   error("isCardValid(Cell) received null", false);
-   return false;
-  }
+  if (cardB == null) {return false;}
 
-  if (!aCard.isEmpty()) {
+  if (!cardB.isEmpty()) {
    return true;
   } else {
    return false;
   }
-
  }
 
  // This method displays the results when the game is solved
@@ -477,74 +383,47 @@ public class Board extends JPanel implements ActionListener {
   Action showImagesAction = new AbstractAction() {
 
    public void actionPerformed(ActionEvent e) {
-    if (isSolved()) {
+    if(isSolved()) {
 
      Float numeralScore = (((float) failedAttempts) / ((float) MAX_CARDS)) * 100;
      String textualScore = numeralScore.toString();
 
      JOptionPane.showMessageDialog(null,
-       "Solved!! Your results:\n" + " Failed Attempts: "
-         + failedAttempts
-         + "\n Error percentage : " + textualScore
-         + " %", "RESULTS",
-       JOptionPane.INFORMATION_MESSAGE);
-    } // if solved
-   } // actionPerformed()
-  }; // class implementation
+       "Solved!! Your results:\n" + " Failed Attempts: " + failedAttempts + "\n Error percentage : " + textualScore + 
+       " %", "RESULTS", JOptionPane.INFORMATION_MESSAGE);
+    } 
+   } 
+  }; 
 
   Timer timer = new Timer(VISIBLE_DELAY, showImagesAction);
   timer.setRepeats(false);
   timer.start();
-
  }
 
- // this method resets all the matched images, used in the replay method and
- // new game
+ // this method resets all the matched images, used in the replay method and new game
  private void resetMatchedImages() {
   for (int row = 0; row < ROWS; row++) {
    for (int column = 0; column < COLUMNS; column++) {
     if (board[row][column].isMatched()) {
      board[row][column].setMatched(false);
-    } // if
-   } // for column
-  } // for row
+    } 
+   } 
+  } 
  }
 
- ////////////////////////////////////////////////////////////////////////////
- // Static methods
- ////////////////////////////////////////////////////////////////////////////
 
- /**
-  * Error reporting.
-  */
- private static void error(String message, boolean crash) {
-  System.err.println(TAG + message);
-  if (crash) {
-   System.exit(-1);
-  }
- }
-
- // This method resets the number of selected cards to 0 after 2 cards have
- // been chosen and checked
- private static void resetSelectedCards() {
-  selectedCards = 0;
- }
+ // This method resets the number of selected cards to 0 after 2 cards have been chosen and checked
+ private static void resetSelectedCards() {selectedCards = 0;}
 
  // This method resets the number of matched pairs on the board
- private static void resetNumMatchedCards() {
- }
+ private static void resetNumMatchedCards() {}
 
  // This method resets the number of failed attempts
- private static void resetFailedAttempts() {
-  failedAttempts = 0;
- }
+ private static void resetFailedAttempts() {failedAttempts = 0;}
 
- // This method resets the parameters of the board
- // used when replaying or when starting a new game
+ // This method resets the parameters of the board used when replaying or when starting a new game
  private static void resetBoardParam() {
-
   resetFailedAttempts();
   resetNumMatchedCards();
  }
-
 }
