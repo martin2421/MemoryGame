@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 
 public class Game extends JFrame {
@@ -48,12 +47,13 @@ public class Game extends JFrame {
    } else if (e.getClickCount() == 1 && e.getComponent() == newButton) {
     board.init();
    } else if (e.getClickCount() == 3 && e.getComponent() == newButton) {                
-       JOptionPane.showMessageDialog(null, "I AM THE DANGER MF\n    ~ Los Pollos Hermanos", "Easter Egg", JOptionPane.WARNING_MESSAGE);
+       JOptionPane.showMessageDialog(null, "I AM THE DANGER MF\n   ~ Los Pollos Hermanos", "Easter Egg", JOptionPane.WARNING_MESSAGE);
    }
   }
  };
 
  public static void main(String[] args) {
   new Game();
+  
  }
 }
